@@ -25,7 +25,7 @@ const app = express()
 app.use(express.json())
 const PORT = process.env.PORT || 3001
 app.use(cors({
-    origin: 'http://myprofiledashboard.com/',
+    origin: 'http://myprofiledashboard.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }))

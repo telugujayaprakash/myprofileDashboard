@@ -6,7 +6,7 @@ export const registerUser = createAsyncThunk(
   'auth/register',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await fetch('https://myprofiledashboardserver.vercel.app//api/users/auth/register', {
+      const response = await fetch('https://myprofiledashboardserver.vercel.app/api/users/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (email, { rejectWithValue }) => {
     try {
-      const response = await fetch('https://myprofiledashboardserver.vercel.app//api/users/auth/login', {
+      const response = await fetch('https://myprofiledashboardserver.vercel.app/api/users/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ export const verifyOTP = createAsyncThunk(
   'auth/verifyOTP',
   async ({ email, otp }, { rejectWithValue }) => {
     try {
-      const response = await fetch('https://myprofiledashboardserver.vercel.app//api/users/auth/verify-otp', {
+      const response = await fetch('https://myprofiledashboardserver.vercel.app/api/users/auth/verify-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

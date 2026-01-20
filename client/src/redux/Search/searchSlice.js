@@ -6,7 +6,7 @@ export const searchUsers = createAsyncThunk(
   'search/searchUsers',
   async (query, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app//api/search/users?q=${encodeURIComponent(query)}`, {
+      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app/api/search/users?q=${encodeURIComponent(query)}`, {
         method: 'GET'
       });
 
@@ -28,7 +28,7 @@ export const searchPosts = createAsyncThunk(
   'search/searchPosts',
   async (query, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app//api/search/posts?q=${encodeURIComponent(query)}`, {
+      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app/api/search/posts?q=${encodeURIComponent(query)}`, {
         method: 'GET'
       });
 

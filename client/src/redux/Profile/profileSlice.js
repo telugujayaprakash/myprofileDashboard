@@ -6,7 +6,7 @@ export const fetchProfile = createAsyncThunk(
   'profile/fetchProfile',
   async (username, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app//${username}`, {
+      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app/${username}`, {
         method: 'GET'
       });
 
@@ -28,7 +28,7 @@ export const updateProfile = createAsyncThunk(
   'profile/updateProfile',
   async (profileData, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth('https://myprofiledashboardserver.vercel.app//api/users/profile-data', {
+      const response = await fetchWithAuth('https://myprofiledashboardserver.vercel.app/api/users/profile-data', {
         method: 'PUT',
         body: JSON.stringify(profileData)
       });
@@ -51,7 +51,7 @@ export const followUser = createAsyncThunk(
   'profile/followUser',
   async (username, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app//api/users/${username}/follow`, {
+      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app/api/users/${username}/follow`, {
         method: 'PUT'
       });
 
@@ -73,7 +73,7 @@ export const unfollowUser = createAsyncThunk(
   'profile/unfollowUser',
   async (username, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app//api/users/${username}/unfollow`, {
+      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app/api/users/${username}/unfollow`, {
         method: 'PUT'
       });
 
