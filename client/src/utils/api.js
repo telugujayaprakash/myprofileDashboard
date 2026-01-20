@@ -1,7 +1,7 @@
 // API utility functions with authentication handling
 import { fetchWithAuth, handleTokenExpiration } from './tokenHandler'
 
-const API_BASE_URL = 'http://localhost:3000'
+const API_BASE_URL = 'https://myprofiledashboardserver.vercel.app/'
 
 // Generic API call function
 export const apiCall = async (endpoint, options = {}) => {
