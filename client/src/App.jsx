@@ -5,16 +5,17 @@ import { checkTokenAndHandleExpiration } from './utils/tokenHandler'
 import { logout } from './redux/Auth/authSlice'
 import Login from './Pages/Login'
 import Signup from './Pages/Signup'
+import Profile from './Pages/Profile'
 import Home from './Pages/Home'
 import CreatePost from './Pages/Create-post'
-import Profile from './Pages/profile'
+
 import Navbar from './Components/Navbar'
 import Search from './Pages/Search'
 
 // Protected Route Component
-function ProtectedRoute({ children }) {
+function ProtectedRoute ({ children }) {
   const dispatch = useDispatch()
-  const { isAuthenticated } = useSelector((state) => state.auth)
+  const { isAuthenticated } = useSelector(state => state.auth)
 
   useEffect(() => {
     // Check token expiration on mount and when authentication state changes
@@ -31,14 +32,14 @@ function ProtectedRoute({ children }) {
     const isValid = checkTokenAndHandleExpiration()
     if (!isValid) {
       dispatch(logout())
-      return <Navigate to="/" replace />
+      return <Navigate to='/' replace />
     }
   }
 
-  return isAuthenticated ? children : <Navigate to="/" replace />
+  return isAuthenticated ? children : <Navigate to='/' replace />
 }
 
-function App() {
+function App () {
   return (
     <>
       <BrowserRouter>
@@ -105,8 +106,7 @@ function App() {
           />
 
           {/* Redirect unknown routes to login */}
-          <Route path='*' element={<Navigate to="/" replace />} />
-
+          <Route path='*' element={<Navigate to='/' replace />} />
         </Routes>
       </BrowserRouter>
     </>
