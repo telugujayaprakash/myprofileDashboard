@@ -25,7 +25,9 @@ const app = express()
 app.use(express.json())
 const PORT = process.env.PORT || 3001
 app.use(cors({
-    origin: '*'
+    origin: 'http://myprofiledashboard.com/',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
 }))
 
 //db connect
