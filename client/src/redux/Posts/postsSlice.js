@@ -6,7 +6,7 @@ export const fetchFeedPosts = createAsyncThunk(
   'posts/fetchFeed',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth('https://myprofiledashboardserver.vercel.app/api/posts/feed', {
+      const response = await fetchWithAuth(`${import.meta.env.VITE_BASE_URL}/api/posts/feed`, {
         method: 'GET'
       });
 
@@ -27,7 +27,7 @@ export const fetchUserPosts = createAsyncThunk(
   'posts/fetchUserPosts',
   async (username, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app/${username}/posts`, {
+      const response = await fetchWithAuth(`${import.meta.env.VITE_BASE_URL}/${username}/posts`, {
         method: 'GET'
       });
 
@@ -48,7 +48,7 @@ export const createPost = createAsyncThunk(
   'posts/createPost',
   async (postData, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth('https://myprofiledashboardserver.vercel.app/api/posts', {
+      const response = await fetchWithAuth(`${import.meta.env.VITE_BASE_URL}/api/posts`, {
         method: 'POST',
         body: JSON.stringify(postData)
       });
@@ -70,7 +70,7 @@ export const likePost = createAsyncThunk(
   'posts/likePost',
   async (postId, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app/api/posts/${postId}/like`, {
+      const response = await fetchWithAuth(`${import.meta.env.VITE_BASE_URL}/api/posts/${postId}/like`, {
         method: 'PUT'
       });
 
@@ -91,7 +91,7 @@ export const sharePost = createAsyncThunk(
   'posts/sharePost',
   async (postId, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth(`https://myprofiledashboardserver.vercel.app/api/posts/${postId}/share`, {
+      const response = await fetchWithAuth(`${import.meta.env.VITE_BASE_URL}/api/posts/${postId}/share`, {
         method: 'PUT'
       });
 
