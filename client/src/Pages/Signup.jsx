@@ -8,7 +8,7 @@ import {
   setEmail
 } from '../redux/Auth/authSlice'
 
-function Signup () {
+function Signup() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -38,9 +38,10 @@ function Signup () {
   }, [dispatch])
 
   const handleInputChange = e => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: name === 'username' ? value.toLowerCase() : value
     })
   }
 

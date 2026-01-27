@@ -9,12 +9,16 @@ const router = express.Router();
 // User Registration Controller - Send OTP
 const userRegister = async (req, res) => {
     try {
-        const { username, email, phonenumber } = req.body;
+        let { username, email, phonenumber } = req.body;
 
         // Validate required fields
         if (!username || !email) {
             return res.status(400).json({ message: 'Username and email are required' });
         }
+
+        // Convert username to lowercase
+        username = username.toLowerCase().trim();
+        email = email.trim();
 
         // Check if user already exists
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });

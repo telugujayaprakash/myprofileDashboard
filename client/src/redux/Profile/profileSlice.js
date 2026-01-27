@@ -1,13 +1,26 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchWithAuth } from '../../utils/tokenHandler';
 
-// Fetch profile by username
+// Fetch profile by username (works with or without authentication)
 export const fetchProfile = createAsyncThunk(
   'profile/fetchProfile',
   async (username, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth(`${import.meta.env.VITE_BASE_URL}/${username}`, {
-        method: 'GET'
+      // Get token if available (but don't require it)
+      const token = localStorage.getItem('token');
+
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      // Add auth header only if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/${username}`, {
+        method: 'GET',
+        headers
       });
 
       if (!response.ok) {

@@ -33,6 +33,11 @@ const profileSchema = new mongoose.Schema({
         default: null,
         maxlength: 200 // Limit status to 200 characters
     },
+    relationshipStatus: {
+        type: String,
+        enum: ['Single', 'Married', 'Committed'],
+        default: 'Single'
+    },
     // Social Media Links (Array of objects)
     socialMediaLinks: [{
         platform: {

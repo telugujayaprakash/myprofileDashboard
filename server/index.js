@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const connect = require('./db/connection')
 const usersAuth = require('./routes/users/user.routes')
-const { getProfile, updateProfileData } = require('./controllers/Users/Auth/userprofile.controller');
+const { getProfile, updateProfileData, getUserById } = require('./controllers/Users/Auth/userprofile.controller');
 const { followUser, unfollowUser, checkFollowing } = require('./controllers/Users/Auth/follow.controller');
 const { verifyuser } = require('./controllers/verifyjwt.controller');
 const {
@@ -50,6 +50,7 @@ app.put('/api/users/profile-data', verifyuser, updateProfileData); // Update pro
 app.put('/api/users/:username/follow', verifyuser, followUser); // Follow user
 app.put('/api/users/:username/unfollow', verifyuser, unfollowUser); // Unfollow user
 app.get('/api/users/:username/following', verifyuser, checkFollowing); // Check if following
+app.get('/api/users/user-by-id/:userid', verifyuser, getUserById); // Get user by ID
 
 // Post routes
 app.post('/api/posts', verifyuser, createPost); // Create post

@@ -6,9 +6,9 @@ import { useEffect } from 'react'
 import { fetchUserPosts, clearUserPosts } from '../redux/Posts/postsSlice'
 import { fetchProfile, clearProfile } from '../redux/Profile/profileSlice'
 
-function Profile () {
+function Profile() {
   const dispatch = useDispatch()
-  const { user } = useSelector((state) => state.auth)
+  const { user, isAuthenticated } = useSelector((state) => state.auth)
   const { userPosts, isLoading, error } = useSelector((state) => state.posts)
   const { currentProfile, isOwnProfile, isLoading: profileLoading, error: profileError } = useSelector((state) => state.profile)
   const { username } = useParams()
@@ -31,11 +31,12 @@ function Profile () {
   const profile = currentProfile ? {
     userid: currentProfile.profile?.userid,
     username: currentProfile.profile?.username || username,
+    displayPicture: currentProfile.profileData?.displayPicture || null,
     name: currentProfile.profileData?.name || currentProfile.profile?.username || 'User',
     profession: currentProfile.profileData?.profession || 'Not specified',
     dob: currentProfile.profileData?.dateOfBirth ? new Date(currentProfile.profileData.dateOfBirth).toISOString().split('T')[0] : 'Not specified',
-    status: currentProfile.profileData?.status || 'Not specified',
     bio: currentProfile.profileData?.status || 'No bio available',
+    relationshipStatus: currentProfile.profileData?.relationshipStatus || 'Single',
     followers: currentProfile.profileData?.followersCount || 0,
     following: currentProfile.profileData?.followingCount || 0,
     socials: currentProfile.profileData?.socialMediaLinks?.reduce((acc, link) => {
@@ -86,8 +87,8 @@ function Profile () {
 
   return (
     <div className='pb-20'>
-      <ProfileHeader 
-        profile={profile} 
+      <ProfileHeader
+        profile={profile}
         isOwnProfile={isOwnProfile}
         username={username}
       />

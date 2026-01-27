@@ -4,17 +4,18 @@ import { X } from 'lucide-react'
 import { updateProfile } from '../redux/Profile/profileSlice'
 import { fetchProfile } from '../redux/Profile/profileSlice'
 
-function EditProfileModal ({ profile, onClose }) {
+function EditProfileModal({ profile, onClose }) {
   const dispatch = useDispatch()
   const { updateLoading, updateError } = useSelector((state) => state.profile)
   const { user } = useSelector((state) => state.auth)
 
   const [formData, setFormData] = useState({
+    displayPicture: profile.displayPicture || '',
     name: profile.name || '',
     profession: profile.profession || '',
     dob: profile.dob !== 'Not specified' ? profile.dob : '',
-    status: profile.bio !== 'No bio available' ? profile.bio : '',
     bio: profile.bio !== 'No bio available' ? profile.bio : '',
+    relationshipStatus: profile.relationshipStatus || 'Single',
     instagram: profile.socials?.instagram || '',
     linkedin: profile.socials?.linkedin || '',
     twitter: profile.socials?.twitter || '',
@@ -32,7 +33,7 @@ function EditProfileModal ({ profile, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     // Build social media links array
     const socialMediaLinks = []
     if (formData.instagram) socialMediaLinks.push({ platform: 'instagram', url: formData.instagram })
@@ -41,11 +42,14 @@ function EditProfileModal ({ profile, onClose }) {
     if (formData.github) socialMediaLinks.push({ platform: 'github', url: formData.github })
     if (formData.website) socialMediaLinks.push({ platform: 'website', url: formData.website })
 
+
     const profileData = {
+      displayPicture: formData.displayPicture || null,
       name: formData.name,
       profession: formData.profession,
       dateOfBirth: formData.dob || null,
-      status: formData.status || formData.bio,
+      status: formData.bio,
+      relationshipStatus: formData.relationshipStatus,
       socialMediaLinks
     }
 
@@ -62,8 +66,14 @@ function EditProfileModal ({ profile, onClose }) {
   }
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60'>
-      <div className='bg-[#0B0D0F] rounded-lg w-full max-w-md mx-4 border border-white/10'>
+    <div
+      className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4'
+      onClick={onClose}
+    >
+      <div
+        className='bg-[#0B0D0F] rounded-lg w-full max-w-md max-h-[90vh] flex flex-col border border-white/10'
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className='flex items-center justify-between p-6 border-b border-white/10'>
           <h2 className='text-xl text-white font-semibold'>Edit Profile</h2>
@@ -75,13 +85,51 @@ function EditProfileModal ({ profile, onClose }) {
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className='p-6 space-y-4'>
+        {/* Form - Scrollable */}
+        <form id='edit-profile-form' onSubmit={handleSubmit} className='flex-1 overflow-y-auto p-6 space-y-4'>
           {updateError && (
             <div className='bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-2 rounded text-sm'>
               {updateError}
             </div>
           )}
+
+          {/* Display Picture */}
+          <div>
+            <label className='block text-sm text-white/80 mb-2'>Profile Picture URL</label>
+            <input
+              type='url'
+              name='displayPicture'
+              value={formData.displayPicture}
+              onChange={handleChange}
+              className='
+                w-full px-4 py-2
+                bg-white/5 border border-white/10
+                rounded-lg text-white
+                focus:outline-none focus:border-white/20
+              '
+              placeholder='https://example.com/your-image.jpg'
+            />
+            {formData.displayPicture && (
+              <div className='mt-3 flex justify-center'>
+                <div className='relative'>
+                  <img
+                    src={formData.displayPicture}
+                    alt='Preview'
+                    className='w-20 h-20 rounded-full object-cover border-2 border-white/20'
+                    onError={(e) => {
+                      e.target.style.display = 'none'
+                      e.target.nextElementSibling.style.display = 'flex'
+                    }}
+                  />
+                  <div
+                    className='w-20 h-20 rounded-full bg-white/10 hidden items-center justify-center text-white/60 text-xs'
+                  >
+                    Invalid URL
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Name */}
           <div>
@@ -136,14 +184,15 @@ function EditProfileModal ({ profile, onClose }) {
             />
           </div>
 
-          {/* Bio/Status */}
+          {/* Bio */}
           <div>
             <label className='block text-sm text-white/80 mb-2'>Bio</label>
             <textarea
-              name='status'
-              value={formData.status}
+              name='bio'
+              value={formData.bio}
               onChange={handleChange}
               rows={3}
+              maxLength={200}
               className='
                 w-full px-4 py-2
                 bg-white/5 border border-white/10
@@ -153,12 +202,34 @@ function EditProfileModal ({ profile, onClose }) {
               '
               placeholder='Tell us about yourself...'
             />
+            <p className='text-xs text-white/40 mt-1'>{formData.bio.length}/200</p>
+          </div>
+
+          {/* Relationship Status */}
+          <div>
+            <label className='block text-sm text-white/80 mb-2'>Relationship Status</label>
+            <select
+              name='relationshipStatus'
+              value={formData.relationshipStatus}
+              onChange={handleChange}
+              className='
+                w-full px-4 py-2
+                bg-white/5 border border-white/10
+                rounded-lg text-white
+                focus:outline-none focus:border-white/20
+                cursor-pointer
+              '
+            >
+              <option value='Single' className='bg-[#0B0D0F]'>Single</option>
+              <option value='Married' className='bg-[#0B0D0F]'>Married</option>
+              <option value='Committed' className='bg-[#0B0D0F]'>Committed</option>
+            </select>
           </div>
 
           {/* Social Media Links */}
           <div className='space-y-3 pt-2'>
             <label className='block text-sm text-white/80 mb-2'>Social Media Links</label>
-            
+
             <input
               type='url'
               name='instagram'
@@ -172,7 +243,7 @@ function EditProfileModal ({ profile, onClose }) {
               '
               placeholder='Instagram URL'
             />
-            
+
             <input
               type='url'
               name='linkedin'
@@ -186,7 +257,7 @@ function EditProfileModal ({ profile, onClose }) {
               '
               placeholder='LinkedIn URL'
             />
-            
+
             <input
               type='url'
               name='twitter'
@@ -200,7 +271,7 @@ function EditProfileModal ({ profile, onClose }) {
               '
               placeholder='Twitter URL'
             />
-            
+
             <input
               type='url'
               name='github'
@@ -214,7 +285,7 @@ function EditProfileModal ({ profile, onClose }) {
               '
               placeholder='GitHub URL'
             />
-            
+
             <input
               type='url'
               name='website'
@@ -229,36 +300,37 @@ function EditProfileModal ({ profile, onClose }) {
               placeholder='Website URL'
             />
           </div>
-
-          {/* Actions */}
-          <div className='flex gap-3 pt-4'>
-            <button
-              type='button'
-              onClick={onClose}
-              className='
-                flex-1 px-4 py-2
-                bg-white/5 hover:bg-white/10
-                text-white rounded-lg
-                transition
-              '
-            >
-              Cancel
-            </button>
-            <button
-              type='submit'
-              disabled={updateLoading}
-              className='
-                flex-1 px-4 py-2
-                bg-blue-600 hover:bg-blue-700
-                text-white rounded-lg
-                transition
-                disabled:opacity-50 disabled:cursor-not-allowed
-              '
-            >
-              {updateLoading ? 'Saving...' : 'Save Changes'}
-            </button>
-          </div>
         </form>
+
+        {/* Footer - Actions (Fixed at bottom) */}
+        <div className='flex gap-3 p-6 border-t border-white/10'>
+          <button
+            type='button'
+            onClick={onClose}
+            className='
+              flex-1 px-4 py-2
+              bg-white/5 hover:bg-white/10
+              text-white rounded-lg
+              transition
+            '
+          >
+            Cancel
+          </button>
+          <button
+            type='submit'
+            form='edit-profile-form'
+            disabled={updateLoading}
+            className='
+              flex-1 px-4 py-2
+              bg-blue-600 hover:bg-blue-700
+              text-white rounded-lg
+              transition
+              disabled:opacity-50 disabled:cursor-not-allowed
+            '
+          >
+            {updateLoading ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
       </div>
     </div>
   )

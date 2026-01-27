@@ -13,7 +13,7 @@ import Navbar from './Components/Navbar'
 import Search from './Pages/Search'
 
 // Protected Route Component
-function ProtectedRoute ({ children }) {
+function ProtectedRoute({ children }) {
   const dispatch = useDispatch()
   const { isAuthenticated } = useSelector(state => state.auth)
 
@@ -39,7 +39,42 @@ function ProtectedRoute ({ children }) {
   return isAuthenticated ? children : <Navigate to='/' replace />
 }
 
-function App () {
+// Public Profile Route - Allows both authenticated and non-authenticated users
+function PublicProfileRoute({ children }) {
+  const dispatch = useDispatch()
+  const { isAuthenticated } = useSelector(state => state.auth)
+
+  useEffect(() => {
+    // Check token expiration for authenticated users
+    if (isAuthenticated) {
+      const isValid = checkTokenAndHandleExpiration()
+      if (!isValid) {
+        dispatch(logout())
+      }
+    }
+  }, [isAuthenticated, dispatch])
+
+  // If authenticated, show with navbar
+  if (isAuthenticated) {
+    return (
+      <div className='flex min-h-screen bg-[#0B0D0F]'>
+        <Navbar />
+        <main className='flex-1 md:ml-64 pt-14 md:pt-0'>
+          {children}
+        </main>
+      </div>
+    )
+  }
+
+  // If not authenticated, show without navbar (public view)
+  return (
+    <div className='min-h-screen bg-[#0B0D0F]'>
+      {children}
+    </div>
+  )
+}
+
+function App() {
   return (
     <>
       <BrowserRouter>
@@ -80,14 +115,9 @@ function App () {
           <Route
             path='/:username'
             element={
-              <ProtectedRoute>
-                <div className='flex min-h-screen bg-[#0B0D0F]'>
-                  <Navbar />
-                  <main className='flex-1 md:ml-64 pt-14 md:pt-0'>
-                    <Profile />
-                  </main>
-                </div>
-              </ProtectedRoute>
+              <PublicProfileRoute>
+                <Profile />
+              </PublicProfileRoute>
             }
           />
 

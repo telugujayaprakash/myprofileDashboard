@@ -69,6 +69,7 @@ const getProfile = async (req, res) => {
                     profession: userProfile.profession,
                     dateOfBirth: userProfile.dateOfBirth,
                     status: userProfile.status,
+                    relationshipStatus: userProfile.relationshipStatus,
                     socialMediaLinks: userProfile.socialMediaLinks,
                     following: userProfile.following,
                     followers: userProfile.followers,
@@ -93,8 +94,8 @@ const getProfile = async (req, res) => {
         } else if (tokenExists && !isTokenUserMatched) {
             // Check if authenticated user is following this profile user
             const authenticatedProfile = await Profile.findOne({ userid: authenticatedUser.userid });
-            const isFollowing = authenticatedProfile && authenticatedProfile.following 
-                ? authenticatedProfile.following.includes(profileUser.userid) 
+            const isFollowing = authenticatedProfile && authenticatedProfile.following
+                ? authenticatedProfile.following.includes(profileUser.userid)
                 : false;
 
             // Token exists but user doesn't match - show limited profile with some public profile data
@@ -114,6 +115,8 @@ const getProfile = async (req, res) => {
                     name: userProfile.name,
                     profession: userProfile.profession,
                     status: userProfile.status,
+                    relationshipStatus: userProfile.relationshipStatus,
+                    socialMediaLinks: userProfile.socialMediaLinks,
                     followingCount: userProfile.following ? userProfile.following.length : 0,
                     followersCount: userProfile.followers ? userProfile.followers.length : 0
                 } : null,
@@ -147,6 +150,8 @@ const getProfile = async (req, res) => {
                     name: userProfile.name,
                     profession: userProfile.profession,
                     status: userProfile.status,
+                    relationshipStatus: userProfile.relationshipStatus,
+                    socialMediaLinks: userProfile.socialMediaLinks,
                     followingCount: userProfile.following ? userProfile.following.length : 0,
                     followersCount: userProfile.followers ? userProfile.followers.length : 0
                 } : null,
@@ -249,6 +254,7 @@ const updateProfileData = async (req, res) => {
             profession,
             dateOfBirth,
             status,
+            relationshipStatus,
             socialMediaLinks
         } = req.body;
 
@@ -277,6 +283,13 @@ const updateProfileData = async (req, res) => {
         if (profession !== undefined) updateData.profession = profession;
         if (dateOfBirth !== undefined) updateData.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : null;
         if (status !== undefined) updateData.status = status;
+        if (relationshipStatus !== undefined) {
+            // Validate relationship status
+            const validStatuses = ['Single', 'Married', 'Committed'];
+            if (validStatuses.includes(relationshipStatus)) {
+                updateData.relationshipStatus = relationshipStatus;
+            }
+        }
 
         // Handle social media links array
         if (socialMediaLinks !== undefined) {
@@ -311,6 +324,7 @@ const updateProfileData = async (req, res) => {
                 profession: updatedProfile.profession,
                 dateOfBirth: updatedProfile.dateOfBirth,
                 status: updatedProfile.status,
+                relationshipStatus: updatedProfile.relationshipStatus,
                 socialMediaLinks: updatedProfile.socialMediaLinks,
                 followingCount: updatedProfile.following ? updatedProfile.following.length : 0,
                 followersCount: updatedProfile.followers ? updatedProfile.followers.length : 0,
@@ -325,4 +339,33 @@ const updateProfileData = async (req, res) => {
     }
 };
 
-module.exports = { getProfile, updateProfile, updateProfileData };
+// Get user by userid (for followers/following lists)
+const getUserById = async (req, res) => {
+    try {
+        const { userid } = req.params;
+
+        // Find user by userid
+        const user = await User.findOne({ userid });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Find profile for additional info
+        const profile = await Profile.findOne({ userid });
+
+        res.status(200).json({
+            user: {
+                userid: user.userid,
+                username: user.username,
+                name: profile?.name || null,
+                displayPicture: profile?.displayPicture || null
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching user by ID:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+module.exports = { getProfile, updateProfile, updateProfileData, getUserById };

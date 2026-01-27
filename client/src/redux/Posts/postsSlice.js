@@ -23,12 +23,26 @@ export const fetchFeedPosts = createAsyncThunk(
   }
 );
 
+
 export const fetchUserPosts = createAsyncThunk(
   'posts/fetchUserPosts',
   async (username, { rejectWithValue }) => {
     try {
-      const response = await fetchWithAuth(`${import.meta.env.VITE_BASE_URL}/${username}/posts`, {
-        method: 'GET'
+      // Get token if available (but don't require it)
+      const token = localStorage.getItem('token');
+
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      // Add auth header only if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/${username}/posts`, {
+        method: 'GET',
+        headers
       });
 
       if (!response.ok) {
