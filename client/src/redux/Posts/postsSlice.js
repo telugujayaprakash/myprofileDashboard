@@ -122,6 +122,28 @@ export const sharePost = createAsyncThunk(
   }
 );
 
+export const addComment = createAsyncThunk(
+  'posts/addComment',
+  async ({ postId, comment }, { rejectWithValue }) => {
+    try {
+      const response = await fetchWithAuth(`${import.meta.env.VITE_BASE_URL}/api/posts/${postId}/comment`, {
+        method: 'POST',
+        body: JSON.stringify({ comment })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return rejectWithValue(errorData.message || 'Failed to add comment');
+      }
+
+      const data = await response.json();
+      return { postId, comment: data.comment, commentsCount: data.commentsCount };
+    } catch (error) {
+      return rejectWithValue(error.message || 'Network error. Please try again.');
+    }
+  }
+);
+
 const postsSlice = createSlice({
   name: 'posts',
   initialState: {
@@ -222,6 +244,25 @@ const postsSlice = createSlice({
         const userPost = state.userPosts.find(post => post._id === postId);
         if (userPost) {
           userPost.shares = shares;
+        }
+      })
+
+      // Add Comment
+      .addCase(addComment.fulfilled, (state, action) => {
+        const { postId, comment, commentsCount } = action.payload;
+        // Update comments in feed posts
+        const feedPost = state.feedPosts.find(post => post._id === postId);
+        if (feedPost) {
+          if (!feedPost.comments) feedPost.comments = [];
+          feedPost.comments.push(comment);
+          feedPost.commentsCount = commentsCount;
+        }
+        // Update comments in user posts
+        const userPost = state.userPosts.find(post => post._id === postId);
+        if (userPost) {
+          if (!userPost.comments) userPost.comments = [];
+          userPost.comments.push(comment);
+          userPost.commentsCount = commentsCount;
         }
       });
   },

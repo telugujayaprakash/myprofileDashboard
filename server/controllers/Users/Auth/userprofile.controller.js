@@ -113,6 +113,7 @@ const getProfile = async (req, res) => {
                 profileData: userProfile ? {
                     displayPicture: userProfile.displayPicture,
                     name: userProfile.name,
+                    dateOfBirth: userProfile.dateOfBirth,
                     profession: userProfile.profession,
                     status: userProfile.status,
                     relationshipStatus: userProfile.relationshipStatus,
@@ -148,6 +149,7 @@ const getProfile = async (req, res) => {
                 profileData: userProfile ? {
                     displayPicture: userProfile.displayPicture,
                     name: userProfile.name,
+                    dateOfBirth: userProfile.dateOfBirth,
                     profession: userProfile.profession,
                     status: userProfile.status,
                     relationshipStatus: userProfile.relationshipStatus,

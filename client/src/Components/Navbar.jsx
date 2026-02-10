@@ -1,11 +1,23 @@
-import { NavLink } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { Menu, X, LogOut } from 'lucide-react'
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { logout } from '../redux/Auth/authSlice'
 
-function Sidebar () {
+function Sidebar() {
   const [open, setOpen] = useState(false)
   const { user } = useSelector((state) => state.auth)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    const confirmed = window.confirm('Are you sure you want to sign out?')
+    if (confirmed) {
+      dispatch(logout())
+      setOpen(false)
+      navigate('/')
+    }
+  }
 
   return (
     <>
@@ -54,11 +66,10 @@ function Sidebar () {
             to='/feed'
             className={({ isActive }) =>
               `px-6 py-3 text-sm tracking-wide transition
-               ${
-                 isActive
-                   ? 'text-white bg-white/10'
-                   : 'text-white/70 hover:text-white hover:bg-white/5'
-               }`
+               ${isActive
+                ? 'text-white bg-white/10'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`
             }
             onClick={() => setOpen(false)}
           >
@@ -66,27 +77,26 @@ function Sidebar () {
           </NavLink>
 
           <NavLink
-  to="/search"
-  className={({ isActive }) =>
-    `px-6 py-3 text-sm transition
+            to="/search"
+            className={({ isActive }) =>
+              `px-6 py-3 text-sm transition
      ${isActive
-      ? 'text-white bg-white/10'
-      : 'text-white/70 hover:text-white hover:bg-white/5'}`
-  }
->
-  Search
-</NavLink>
+                ? 'text-white bg-white/10'
+                : 'text-white/70 hover:text-white hover:bg-white/5'}`
+            }
+          >
+            Search
+          </NavLink>
 
 
           <NavLink
             to='/create'
             className={({ isActive }) =>
               `px-6 py-3 text-sm tracking-wide transition
-               ${
-                 isActive
-                   ? 'text-white bg-white/10'
-                   : 'text-white/70 hover:text-white hover:bg-white/5'
-               }`
+               ${isActive
+                ? 'text-white bg-white/10'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`
             }
             onClick={() => setOpen(false)}
           >
@@ -97,16 +107,24 @@ function Sidebar () {
             to={`/${user?.username}`}
             className={({ isActive }) =>
               `px-6 py-3 text-sm tracking-wide transition
-               ${
-                 isActive
-                   ? 'text-white bg-white/10'
-                   : 'text-white/70 hover:text-white hover:bg-white/5'
-               }`
+               ${isActive
+                ? 'text-white bg-white/10'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`
             }
             onClick={() => setOpen(false)}
           >
             {user?.username || 'Profile'}
           </NavLink>
+
+          {/* Sign Out Button */}
+          <button
+            onClick={handleLogout}
+            className='px-6 py-3 text-sm tracking-wide transition text-white/70 hover:text-white hover:bg-white/5 flex items-center gap-2 mt-auto'
+          >
+            <LogOut size={18} />
+            Sign Out
+          </button>
         </nav>
       </aside>
     </>

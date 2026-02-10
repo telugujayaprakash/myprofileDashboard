@@ -59,11 +59,33 @@ const getUserPosts = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        // Get user's profile for display picture
+        const userProfile = await Profile.findOne({ userid: user.userid });
+
         // Get posts by this user
         const posts = await Post.find({
             userid: user.userid,
             isActive: true
         }).sort({ createdAt: -1 });
+
+        // Get all unique user IDs from comments
+        const commentUserIds = new Set();
+        posts.forEach(post => {
+            post.comments.forEach(comment => {
+                if (comment.userid) commentUserIds.add(comment.userid);
+            });
+        });
+
+        // Get display pictures for comment authors
+        const commentProfiles = await Profile.find({
+            userid: { $in: Array.from(commentUserIds) }
+        });
+
+        // Create a map of userid to displayPicture
+        const displayPictureMap = {};
+        commentProfiles.forEach(profile => {
+            displayPictureMap[profile.userid] = profile.displayPicture || null;
+        });
 
         res.status(200).json({
             user: {
@@ -74,11 +96,15 @@ const getUserPosts = async (req, res) => {
                 _id: post._id,
                 userid: post.userid,
                 username: post.username,
+                displayPicture: userProfile?.displayPicture || null,
                 textmsg: post.textmsg,
                 likes: post.likes,
                 shares: post.shares,
                 commentsCount: post.comments.length,
-                comments: post.comments.slice(-3), // Last 3 comments
+                comments: post.comments.slice(-3).map(comment => ({
+                    ...comment.toObject(),
+                    displayPicture: displayPictureMap[comment.userid] || null
+                })),
                 createdAt: post.createdAt,
                 updatedAt: post.updatedAt
             }))
@@ -110,16 +136,40 @@ const getFeedPosts = async (req, res) => {
             isActive: true
         }).sort({ createdAt: -1 }).limit(50); // Limit to 50 posts for performance
 
+        // Get all unique user IDs from posts and comments
+        const allUserIds = new Set();
+        posts.forEach(post => {
+            allUserIds.add(post.userid);
+            post.comments.forEach(comment => {
+                if (comment.userid) allUserIds.add(comment.userid);
+            });
+        });
+
+        // Get display pictures for all users
+        const userProfiles = await Profile.find({
+            userid: { $in: Array.from(allUserIds) }
+        });
+
+        // Create a map of userid to displayPicture
+        const displayPictureMap = {};
+        userProfiles.forEach(profile => {
+            displayPictureMap[profile.userid] = profile.displayPicture || null;
+        });
+
         res.status(200).json({
             posts: posts.map(post => ({
                 _id: post._id,
                 userid: post.userid,
                 username: post.username,
+                displayPicture: displayPictureMap[post.userid] || null,
                 textmsg: post.textmsg,
                 likes: post.likes,
                 shares: post.shares,
                 commentsCount: post.comments.length,
-                comments: post.comments.slice(-3), // Last 3 comments
+                comments: post.comments.slice(-3).map(comment => ({
+                    ...comment.toObject(),
+                    displayPicture: displayPictureMap[comment.userid] || null
+                })),
                 createdAt: post.createdAt,
                 updatedAt: post.updatedAt
             }))
@@ -222,6 +272,9 @@ const addComment = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        // Get user's profile for display picture
+        const userProfile = await Profile.findOne({ userid });
+
         const post = await Post.findById(postId);
         if (!post || !post.isActive) {
             return res.status(404).json({ message: 'Post not found' });
@@ -231,6 +284,7 @@ const addComment = async (req, res) => {
         const newComment = {
             userid,
             username: user.username,
+            displayPicture: userProfile?.displayPicture || null,
             comment: comment.trim()
         };
 
